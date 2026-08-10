@@ -152,10 +152,10 @@ body{
       <h3>Вкажи Telegram і UID</h3>
       <form id="free-form" onsubmit="return submitFreeForm(event)">
         <div class="f-row">
-          <input class="f-inp" id="free-tg" type="text" placeholder="Telegram, напр. @username" maxlength="40" required autocomplete="off" oninput="validateFreeForm()">
+          <input class="f-inp" id="free-tg" type="text" placeholder="Telegram, напр. @username" maxlength="40" required autocomplete="off" oninput="validateFreeForm(); saveUiState();">
         </div>
         <div class="f-row">
-          <input class="f-inp" id="free-uid" type="text" inputmode="numeric" placeholder="MEXC UID" maxlength="12" required autocomplete="off" oninput="validateFreeForm()">
+          <input class="f-inp" id="free-uid" type="text" inputmode="numeric" placeholder="MEXC UID" maxlength="12" required autocomplete="off" oninput="validateFreeForm(); saveUiState();">
         </div>
         <button class="btn btn-mono" type="submit" id="free-submit-btn" disabled>Надіслати заявку</button>
         <div class="err" id="free-err"></div>
@@ -211,7 +211,7 @@ body{
         <h3>Встав хеш транзакції</h3>
         <form id="usdt-form" onsubmit="return submitUsdtForm(event)">
           <div class="f-row">
-            <input class="f-inp" id="usdt-tx" type="text" placeholder="Хеш транзакції (TXID)" maxlength="120" required autocomplete="off" oninput="validateUsdtForm()">
+            <input class="f-inp" id="usdt-tx" type="text" placeholder="Хеш транзакції (TXID)" maxlength="120" required autocomplete="off" oninput="validateUsdtForm(); saveUiState();">
           </div>
           <button class="btn btn-mono" type="submit" id="usdt-submit-btn" disabled>Надіслати заявку</button>
           <div class="err" id="usdt-err"></div>
@@ -304,15 +304,64 @@ body{
 const SB_URL = 'https://lkdndggczlqpcylrudpa.supabase.co';
 const SB_KEY = 'sb_publishable_f_SmYZN-SCY5m1J0oYIg9Q_IOS6fE59';
 
+// СТАН ЕКРАНА — зберігаємо, на якому кроці перебуває користувач (навіть ДО
+// відправки заявки: сам факт переходу на екран, введені Telegram/UID/хеш),
+// щоб перезавантаження сторінки ніколи не скидало все на самий початок.
+const UI_STATE_KEY = 'blue_ui_state';
+
+function saveUiState(){
+  const active = document.querySelector('.screen.active');
+  const tgEl = document.getElementById('free-tg');
+  const uidEl = document.getElementById('free-uid');
+  const txEl = document.getElementById('usdt-tx');
+  const state = {
+    screen: active ? active.id : 'screen-choice',
+    paidOpen: document.getElementById('usdt-flow').style.display !== 'none' ? 'usdt'
+             : (document.getElementById('card-flow').style.display !== 'none' ? 'card' : null),
+    tg: tgEl ? tgEl.value : '',
+    uid: uidEl ? uidEl.value : '',
+    usdtTx: txEl ? txEl.value : ''
+  };
+  try{ localStorage.setItem(UI_STATE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function restoreUiState(){
+  try{
+    const raw = localStorage.getItem(UI_STATE_KEY);
+    if(!raw) return;
+    const state = JSON.parse(raw);
+
+    if(state.tg) document.getElementById('free-tg').value = state.tg;
+    if(state.uid) document.getElementById('free-uid').value = state.uid;
+    if(state.usdtTx) document.getElementById('usdt-tx').value = state.usdtTx;
+    validateFreeForm();
+    validateUsdtForm();
+
+    if(state.screen === 'screen-paid' && state.paidOpen === 'usdt'){
+      document.getElementById('paid-step1').style.display = 'none';
+      document.getElementById('usdt-flow').style.display = 'block';
+    } else if(state.screen === 'screen-paid' && state.paidOpen === 'card'){
+      document.getElementById('paid-step1').style.display = 'none';
+      document.getElementById('card-flow').style.display = 'block';
+    }
+
+    if(state.screen && document.getElementById(state.screen)){
+      goTo(state.screen);
+    }
+  }catch(e){}
+}
+
 function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  saveUiState();
 }
 
 // Скидає всі кроки форм до початкового стану — потрібно, коли користувач
 // подає заявку повторно після відхилення (без перезавантаження сторінки).
 function restartApplication(){
   localStorage.removeItem(REG_CACHE_KEY);
+  localStorage.removeItem(UI_STATE_KEY);
 
   document.getElementById('free-step2').style.display = 'block';
   document.getElementById('free-step3').style.display = 'none';
@@ -393,6 +442,7 @@ function showUsdtFlow(){
   tx.value = '';
   document.getElementById('usdt-submit-btn').disabled = true;
   document.getElementById('usdt-err').textContent = '';
+  saveUiState();
 }
 
 function showCardFlow(){
@@ -405,6 +455,7 @@ function showCardFlow(){
   onFileSelected(document.getElementById('card-shot'), 'card-shot-label');
   document.getElementById('card-submit-btn').disabled = true;
   document.getElementById('card-err').textContent = '';
+  saveUiState();
 }
 
 function validateCardForm(){
@@ -448,9 +499,11 @@ function goBackFromPaid(){
   if(usdtOpen){
     document.getElementById('usdt-flow').style.display = 'none';
     document.getElementById('paid-step1').style.display = 'block';
+    saveUiState();
   } else if(cardOpen){
     document.getElementById('card-flow').style.display = 'none';
     document.getElementById('paid-step1').style.display = 'block';
+    saveUiState();
   } else {
     goTo('screen-choice');
   }
@@ -614,9 +667,14 @@ async function refreshRegState(){
 // 3) далі періодично (кожні 15с) перевіряємо статус, поки заявка не отримає фінальний статус —
 //    щоб підтвердження/відхилення з адмінки з'являлось само, без ручного перезавантаження.
 async function boot(){
+  // 1) відновлюємо, на якому кроці був користувач (навіть якщо заявку ще не надсилав)
+  restoreUiState();
+
+  // 2) якщо є кешований результат реальної заявки — він має пріоритет над кроком форми
   const cached = loadRegCache();
   if(cached) applyRegState(cached);
 
+  // 3) звіряємось із базою і продовжуємо періодично перевіряти статус
   await refreshRegState();
 
   pollTimer = setInterval(refreshRegState, 15000);
