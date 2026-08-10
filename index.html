@@ -58,7 +58,16 @@ body{
   font-size:11px;color:var(--muted);cursor:pointer;text-decoration:none;
 }
 .back-link:hover{color:#1a1a18;}
-.panel{background:#0a0a0a;color:#fff;padding:28px;border-radius:6px;margin-bottom:14px;}
+.panel{background:#0a0a0a;color:#fff;padding:28px;border-radius:6px;margin-bottom:14px;position:relative;}
+.close-x{
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:50%;
+  background:none;border:1px solid #333;color:#999;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;line-height:1;padding:0;
+  font-family:'DM Sans',sans-serif;transition:all .15s;
+}
+.close-x:hover{border-color:#fff;color:#fff;}
 .panel-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
 .panel h3{font-size:16px;margin-bottom:6px;}
 .panel p{font-size:12px;color:#999;margin-bottom:14px;line-height:1.6;}
@@ -273,6 +282,7 @@ body{
 <!-- ЕКРАН 4 — доступ підтверджено (показується автоматично цьому пристрою) -->
 <div class="screen" id="screen-link">
   <div class="panel">
+    <button class="close-x" onclick="closeConfirmScreen()" aria-label="Закрити">✕</button>
     <div class="sub-step confirm-center">
       <div class="check-circle">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -359,9 +369,23 @@ function goTo(id){
 
 // Скидає всі кроки форм до початкового стану — потрібно, коли користувач
 // подає заявку повторно після відхилення (без перезавантаження сторінки).
+// Якщо користувач закрив екран підтвердження хрестиком — запам'ятовуємо ID
+// саме цієї заявки, щоб при наступних заходах/оновленнях сторінка більше
+// НЕ підкидала його примусово назад на цей екран (поки не буде нової заявки).
+const CONFIRM_DISMISSED_KEY = 'blue_confirm_dismissed';
+
+function closeConfirmScreen(){
+  try{
+    const cached = loadRegCache();
+    if(cached && cached.id != null){ localStorage.setItem(CONFIRM_DISMISSED_KEY, String(cached.id)); }
+  }catch(e){}
+  goTo('screen-choice');
+}
+
 function restartApplication(){
   localStorage.removeItem(REG_CACHE_KEY);
   localStorage.removeItem(UI_STATE_KEY);
+  localStorage.removeItem(CONFIRM_DISMISSED_KEY);
 
   document.getElementById('free-step2').style.display = 'block';
   document.getElementById('free-step3').style.display = 'none';
@@ -613,8 +637,12 @@ function applyRegState(rec){
   if(!rec) return false;
 
   if(rec.status === 'approved' && rec.invite_link){
-    document.getElementById('invite-link-btn').href = rec.invite_link;
-    goTo('screen-link');
+    let dismissed = false;
+    try{ dismissed = localStorage.getItem(CONFIRM_DISMISSED_KEY) === String(rec.id); }catch(e){}
+    if(!dismissed){
+      document.getElementById('invite-link-btn').href = rec.invite_link;
+      goTo('screen-link');
+    }
     return true;
   }
 
