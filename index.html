@@ -10,17 +10,24 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --blue:#1C9FE0;
-  --muted:#8a8a85;
+  --blue-dim:#1279b3;
+  --panel:#0a1620;
+  --panel2:#0d1e2c;
+  --border:#1c3145;
+  --border-soft:#152736;
+  --muted:#7d93a3;
   --err:#e05555;
 }
 html,body{height:100%;}
 body{
-  background:#fff;
+  background:#f4f8fb;
   color:#1a1a18;
   font-family:'DM Sans',sans-serif;
 }
 .phone{
-  background:#fff;
+  background:
+    radial-gradient(520px 320px at 50% 0%, rgba(28,159,224,.10), transparent 70%),
+    #f4f8fb;
   width:100%;
   max-width:430px;
   min-height:100vh;
@@ -40,90 +47,103 @@ body{
 
 /* КАРТКА ВИБОРУ */
 .card{
-  background:#0a0a0a;color:#fff;
-  padding:36px 28px;border-radius:6px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  color:#fff;border:1px solid var(--border-soft);border-top:3px solid var(--blue);
+  padding:36px 28px;border-radius:10px;
+  box-shadow:0 20px 44px -20px rgba(28,159,224,.35);
 }
 .card-btn{
   display:block;width:100%;padding:16px;margin-bottom:12px;
-  background:none;border:1px solid #333;color:#fff;
+  background:rgba(28,159,224,.06);border:1px solid var(--border);color:#fff;
   font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;
-  border-radius:3px;cursor:pointer;transition:all .15s;
+  border-radius:6px;cursor:pointer;transition:all .15s;
 }
 .card-btn:last-child{margin-bottom:0;}
-.card-btn:hover{background:#fff;color:#0a0a0a;border-color:#fff;}
+.card-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
 
 /* КРОКИ ПІСЛЯ ВИБОРУ */
 .back-link{
   display:inline-block;margin-bottom:20px;font-family:'DM Mono',monospace;
   font-size:11px;color:var(--muted);cursor:pointer;text-decoration:none;
 }
-.back-link:hover{color:#1a1a18;}
-.panel{background:#0a0a0a;color:#fff;padding:28px;border-radius:6px;margin-bottom:14px;position:relative;}
+.back-link:hover{color:var(--blue);}
+.panel{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  color:#fff;border:1px solid var(--border-soft);border-top:3px solid var(--blue);
+  padding:28px;border-radius:10px;margin-bottom:14px;position:relative;
+  box-shadow:0 20px 44px -20px rgba(28,159,224,.35);
+}
 .close-x{
   position:absolute;top:14px;right:14px;
   width:28px;height:28px;border-radius:50%;
-  background:none;border:1px solid #333;color:#999;
+  background:none;border:1px solid var(--border);color:var(--muted);
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:15px;line-height:1;padding:0;
   font-family:'DM Sans',sans-serif;transition:all .15s;
 }
-.close-x:hover{border-color:#fff;color:#fff;}
+.close-x:hover{border-color:var(--blue);color:var(--blue);}
 .panel-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
 .panel h3{font-size:16px;margin-bottom:6px;}
-.panel p{font-size:12px;color:#999;margin-bottom:14px;line-height:1.6;}
-.sub-step{padding:20px 0;border-bottom:1px solid #232323;}
+.panel p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
+.sub-step{padding:20px 0;border-bottom:1px solid var(--border-soft);}
 .sub-step:first-child{padding-top:0;}
 .sub-step:last-child{border-bottom:none;padding-bottom:0;}
 .sub-step h3{font-size:15px;margin-bottom:12px;}
-.sub-step p{font-size:12px;color:#999;line-height:1.6;margin-bottom:0;}
+.sub-step p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:0;}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;
-  padding:13px 18px;border-radius:3px;border:none;cursor:pointer;
-  text-decoration:none;transition:opacity .15s;width:100%;
+  padding:13px 18px;border-radius:6px;border:none;cursor:pointer;
+  text-decoration:none;transition:all .15s;width:100%;
 }
-.btn:hover{opacity:.85;}
-.btn-blue{background:var(--blue);color:#fff;}
-.btn-mono{background:#fff;color:#0a0a0a;}
-.btn-mono:disabled{background:#2a2a2a;color:#666;cursor:not-allowed;}
-.panel-lbl.mono{color:#888;}
+.btn:hover{opacity:.9;}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 10px 24px -10px rgba(28,159,224,.7);}
+.btn-blue:hover{background:var(--blue-dim);opacity:1;}
+.btn-blue:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none;}
+.btn-mono{background:#fff;color:#0a1620;}
+.btn-mono:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-outline{background:rgba(28,159,224,.06);border:1px solid var(--border);color:#fff;}
+.btn-outline:hover{background:var(--blue);border-color:var(--blue);opacity:1;}
+.panel-lbl.mono{color:var(--muted);}
 .step-ok{font-size:12px;color:#7fd192;margin-top:10px;}
-.pay-box{background:#141414;border:1px solid #262626;padding:14px 14px 12px;margin-bottom:8px;border-radius:6px;}
+.pay-box{background:var(--panel2);border:1px solid var(--border);padding:14px 14px 12px;margin-bottom:8px;border-radius:8px;}
 .pay-box-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
-.pay-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#777;margin-bottom:6px;}
+.pay-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
 .pay-box-hdr .pay-lbl{margin-bottom:0;}
 .pay-val{
-  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:-.01em;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:-.01em;color:#fff;
   cursor:pointer;user-select:all;white-space:nowrap;overflow-x:auto;
   -ms-overflow-style:none;scrollbar-width:none;padding-bottom:2px;
 }
 .pay-val::-webkit-scrollbar{display:none;}
-.pay-note{font-size:11px;color:#888;margin-top:8px;min-height:14px;}
+.pay-note{font-size:11px;color:var(--blue);margin-top:8px;min-height:14px;}
 .btn-stack{display:flex;flex-direction:column;gap:10px;}
 .copy-btn{
-  flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.04em;
-  background:none;border:1px solid #333;color:#ccc;
-  padding:7px 11px;border-radius:4px;cursor:pointer;white-space:nowrap;
-  transition:all .15s;
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;padding:0;
+  background:rgba(28,159,224,.08);border:1px solid var(--border);color:#a9c3d4;
+  border-radius:7px;cursor:pointer;transition:all .15s;
 }
-.copy-btn:hover{border-color:#fff;color:#fff;}
+.copy-btn svg{width:16px;height:16px;}
+.copy-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(28,159,224,.14);}
+.copy-btn.copied{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.1);}
 .f-row{margin-bottom:14px;}
 .f-inp{
-  width:100%;padding:12px;border:1px solid #2a2a2a;background:#161616;
-  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;border-radius:3px;
+  width:100%;padding:12px;border:1px solid var(--border);background:var(--panel2);
+  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;border-radius:6px;
 }
-.f-inp::placeholder{color:#555;}
+.f-inp::placeholder{color:#4f6577;}
 .f-inp:focus{outline:none;border-color:var(--blue);}
 .err{color:var(--err);font-size:12px;margin-top:10px;min-height:14px;}
 .file-drop{
-  display:block;width:100%;padding:12px;border:1px dashed #333;background:#161616;
-  font-family:'DM Sans',sans-serif;font-size:13px;color:#777;text-align:center;
-  border-radius:3px;cursor:pointer;transition:all .15s;
+  display:block;width:100%;padding:12px;border:1px dashed var(--border);background:var(--panel2);
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);text-align:center;
+  border-radius:6px;cursor:pointer;transition:all .15s;
 }
-.file-drop:hover{border-color:#555;color:#bbb;}
+.file-drop:hover{border-color:var(--blue);color:var(--blue);}
 .file-drop.has-file{border-style:solid;border-color:var(--blue);color:#fff;}
 .reject-lbl{color:var(--err) !important;}
-.reason-box{background:#141414;border:1px solid #262626;border-radius:6px;padding:14px;margin:14px 0;font-size:13px;color:#ddd;line-height:1.6;}
+.reason-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px;margin:14px 0;font-size:13px;color:#ddd;line-height:1.6;}
 .confirm-center{text-align:center;}
 .check-circle{
   width:56px;height:56px;border-radius:50%;background:#2ecc71;
@@ -153,7 +173,7 @@ body{
     <div class="sub-step">
       <div class="panel-lbl mono">Крок 1</div>
       <h3>Реєстрація по посиланню</h3>
-      <a class="btn btn-mono" href="https://www.mexc.com/uk-UA/acquisition/custom-sign-up?shareCode=mexc-hadexgroup" target="_blank" rel="noopener">Реєстрація на MEXC →</a>
+      <a class="btn btn-blue" href="https://www.mexc.com/uk-UA/acquisition/custom-sign-up?shareCode=mexc-hadexgroup" target="_blank" rel="noopener">Реєстрація на MEXC →</a>
     </div>
 
     <div class="sub-step" id="free-step2">
@@ -166,7 +186,7 @@ body{
         <div class="f-row">
           <input class="f-inp" id="free-uid" type="text" inputmode="numeric" placeholder="MEXC UID" maxlength="12" required autocomplete="off" oninput="validateFreeForm(); saveUiState();">
         </div>
-        <button class="btn btn-mono" type="submit" id="free-submit-btn" disabled>Надіслати заявку</button>
+        <button class="btn btn-blue" type="submit" id="free-submit-btn" disabled>Надіслати заявку</button>
         <div class="err" id="free-err"></div>
       </form>
     </div>
@@ -190,8 +210,8 @@ body{
       <div class="panel-lbl mono">Крок 1</div>
       <h3>Обери спосіб оплати</h3>
       <div class="btn-stack">
-        <button class="btn btn-mono" onclick="showUsdtFlow()">Оплатити в USDT</button>
-        <button class="btn btn-mono" onclick="showCardFlow()">Оплатити на карту</button>
+        <button class="btn btn-outline" onclick="showUsdtFlow()">Оплатити в USDT</button>
+        <button class="btn btn-outline" onclick="showCardFlow()">Оплатити на карту</button>
       </div>
     </div>
 
@@ -203,7 +223,9 @@ body{
         <div class="pay-box">
           <div class="pay-box-hdr">
             <div class="pay-lbl">USDT (TRC20)</div>
-            <button type="button" class="copy-btn" onclick="copyText(document.getElementById('usdt-addr-val'),'usdt-copy-note')">Копіювати</button>
+            <button type="button" class="copy-btn" id="usdt-copy-btn" onclick="copyText(document.getElementById('usdt-addr-val'),'usdt-copy-note','usdt-copy-btn')" aria-label="Копіювати">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
           </div>
           <div class="pay-val" id="usdt-addr-val" onclick="copyText(this,'usdt-copy-note')">TDQ9D4ZdeJvPDPm2qdTjNtcSHekq791mMc</div>
         </div>
@@ -222,7 +244,7 @@ body{
           <div class="f-row">
             <input class="f-inp" id="usdt-tx" type="text" placeholder="Хеш транзакції (TXID)" maxlength="120" required autocomplete="off" oninput="validateUsdtForm(); saveUiState();">
           </div>
-          <button class="btn btn-mono" type="submit" id="usdt-submit-btn" disabled>Надіслати заявку</button>
+          <button class="btn btn-blue" type="submit" id="usdt-submit-btn" disabled>Надіслати заявку</button>
           <div class="err" id="usdt-err"></div>
         </form>
       </div>
@@ -243,7 +265,9 @@ body{
         <div class="pay-box">
           <div class="pay-box-hdr">
             <div class="pay-lbl">Monobank</div>
-            <button type="button" class="copy-btn" onclick="copyText(document.getElementById('card-num-val'),'card-copy-note')">Копіювати</button>
+            <button type="button" class="copy-btn" id="card-copy-btn" onclick="copyText(document.getElementById('card-num-val'),'card-copy-note','card-copy-btn')" aria-label="Копіювати">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
           </div>
           <div class="pay-val" id="card-num-val" onclick="copyText(this,'card-copy-note')">4441 1110 0507 4426</div>
         </div>
@@ -263,7 +287,7 @@ body{
             <label class="file-drop" id="card-shot-label" for="card-shot">Прикріпити скріншот оплати</label>
             <input type="file" id="card-shot" accept="image/*" style="display:none" onchange="onFileSelected(this,'card-shot-label'); validateCardForm();">
           </div>
-          <button class="btn btn-mono" type="submit" id="card-submit-btn" disabled>Надіслати заявку</button>
+          <button class="btn btn-blue" type="submit" id="card-submit-btn" disabled>Надіслати заявку</button>
           <div class="err" id="card-err"></div>
         </form>
       </div>
@@ -291,7 +315,7 @@ body{
       </div>
       <div class="panel-lbl mono confirm-lbl">Доступ підтверджено</div>
       <h3>Вітаємо! Заявку прийнято</h3>
-      <a class="btn btn-mono" id="invite-link-btn" href="#" target="_blank" rel="noopener">Долучитися →</a>
+      <a class="btn btn-blue" id="invite-link-btn" href="#" target="_blank" rel="noopener">Долучитися →</a>
     </div>
   </div>
 </div>
@@ -416,12 +440,19 @@ function getDeviceId(){
 }
 const DEVICE_ID = getDeviceId();
 
-function copyText(el, noteId){
+function copyText(el, noteId, btnId){
   const text = el.textContent.replace(/\s/g,'');
   navigator.clipboard.writeText(text).then(()=>{
     const note = document.getElementById(noteId);
     note.textContent = '✓ скопійовано';
     setTimeout(()=>{ note.innerHTML = '&nbsp;'; }, 2000);
+    if(btnId){
+      const btn = document.getElementById(btnId);
+      if(btn){
+        btn.classList.add('copied');
+        setTimeout(()=>{ btn.classList.remove('copied'); }, 2000);
+      }
+    }
   });
 }
 
