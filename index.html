@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLUE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1C9FE0;
+  --muted:#8a8a85;
+  --err:#e05555;
+}
+html,body{height:100%;}
+body{
+  background:#fff;
+  color:#1a1a18;
+  font-family:'DM Sans',sans-serif;
+}
+.phone{
+  background:#fff;
+  width:100%;
+  max-width:430px;
+  min-height:100vh;
+  min-height:100dvh;
+  margin:0 auto;
+  padding:24px 18px 40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  position:relative;
+}
+@media(max-width:359px){
+  .phone{ padding:18px 14px 32px; }
+}
+.screen{display:none;width:100%;}
+.screen.active{display:block;}
+
+/* КАРТКА ВИБОРУ */
+.card{
+  background:#0a0a0a;color:#fff;
+  padding:36px 28px;border-radius:6px;
+}
+.card-btn{
+  display:block;width:100%;padding:16px;margin-bottom:12px;
+  background:none;border:1px solid #333;color:#fff;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;
+  border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.card-btn:last-child{margin-bottom:0;}
+.card-btn:hover{background:#fff;color:#0a0a0a;border-color:#fff;}
+
+/* КРОКИ ПІСЛЯ ВИБОРУ */
+.back-link{
+  display:inline-block;margin-bottom:20px;font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--muted);cursor:pointer;text-decoration:none;
+}
+.back-link:hover{color:#1a1a18;}
+.panel{background:#0a0a0a;color:#fff;padding:28px;border-radius:6px;margin-bottom:14px;}
+.panel-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
+.panel h3{font-size:16px;margin-bottom:6px;}
+.panel p{font-size:12px;color:#999;margin-bottom:14px;line-height:1.6;}
+.sub-step{padding:20px 0;border-bottom:1px solid #232323;}
+.sub-step:first-child{padding-top:0;}
+.sub-step:last-child{border-bottom:none;padding-bottom:0;}
+.sub-step h3{font-size:15px;margin-bottom:12px;}
+.sub-step p{font-size:12px;color:#999;line-height:1.6;margin-bottom:0;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;
+  padding:13px 18px;border-radius:3px;border:none;cursor:pointer;
+  text-decoration:none;transition:opacity .15s;width:100%;
+}
+.btn:hover{opacity:.85;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-mono{background:#fff;color:#0a0a0a;}
+.btn-mono:disabled{background:#2a2a2a;color:#666;cursor:not-allowed;}
+.panel-lbl.mono{color:#888;}
+.step-ok{font-size:12px;color:#7fd192;margin-top:10px;}
+.pay-box{background:#141414;border:1px solid #262626;padding:14px 14px 12px;margin-bottom:8px;border-radius:6px;}
+.pay-box-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.pay-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#777;margin-bottom:6px;}
+.pay-box-hdr .pay-lbl{margin-bottom:0;}
+.pay-val{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:-.01em;
+  cursor:pointer;user-select:all;white-space:nowrap;overflow-x:auto;
+  -ms-overflow-style:none;scrollbar-width:none;padding-bottom:2px;
+}
+.pay-val::-webkit-scrollbar{display:none;}
+.pay-note{font-size:11px;color:#888;margin-top:8px;min-height:14px;}
+.btn-stack{display:flex;flex-direction:column;gap:10px;}
+.copy-btn{
+  flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.04em;
+  background:none;border:1px solid #333;color:#ccc;
+  padding:7px 11px;border-radius:4px;cursor:pointer;white-space:nowrap;
+  transition:all .15s;
+}
+.copy-btn:hover{border-color:#fff;color:#fff;}
+.f-row{margin-bottom:14px;}
+.f-inp{
+  width:100%;padding:12px;border:1px solid #2a2a2a;background:#161616;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;border-radius:3px;
+}
+.f-inp::placeholder{color:#555;}
+.f-inp:focus{outline:none;border-color:var(--blue);}
+.err{color:var(--err);font-size:12px;margin-top:10px;min-height:14px;}
+.file-drop{
+  display:block;width:100%;padding:12px;border:1px dashed #333;background:#161616;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:#777;text-align:center;
+  border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.file-drop:hover{border-color:#555;color:#bbb;}
+.file-drop.has-file{border-style:solid;border-color:var(--blue);color:#fff;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ЕКРАН 1 — вибір -->
+<div class="screen active" id="screen-choice">
+  <div class="card">
+    <button class="card-btn" onclick="goTo('screen-free')">Безкоштовний доступ</button>
+    <button class="card-btn" onclick="goTo('screen-paid')">Платний доступ</button>
+  </div>
+</div>
+
+<!-- ЕКРАН 2 — безкоштовний (реферал), один модуль, чорно-білий -->
+<div class="screen" id="screen-free">
+  <a class="back-link" onclick="goTo('screen-choice')">← назад</a>
+
+  <div class="panel">
+
+    <div class="sub-step">
+      <div class="panel-lbl mono">Крок 1</div>
+      <h3>Реєстрація по посиланню</h3>
+      <a class="btn btn-mono" href="https://www.mexc.com/uk-UA/acquisition/custom-sign-up?shareCode=mexc-hadexgroup" target="_blank" rel="noopener">Реєстрація на MEXC →</a>
+    </div>
+
+    <div class="sub-step" id="free-step2">
+      <div class="panel-lbl mono">Крок 2</div>
+      <h3>Вкажи Telegram і UID</h3>
+      <form id="free-form" onsubmit="return submitFreeForm(event)">
+        <div class="f-row">
+          <input class="f-inp" id="free-tg" type="text" placeholder="Telegram, напр. @username" maxlength="40" required autocomplete="off" oninput="validateFreeForm()">
+        </div>
+        <div class="f-row">
+          <input class="f-inp" id="free-uid" type="text" inputmode="numeric" placeholder="MEXC UID" maxlength="12" required autocomplete="off" oninput="validateFreeForm()">
+        </div>
+        <button class="btn btn-mono" type="submit" id="free-submit-btn" disabled>Надіслати заявку</button>
+        <div class="err" id="free-err"></div>
+      </form>
+    </div>
+
+    <div class="sub-step" id="free-step3" style="display:none">
+      <div class="panel-lbl mono">Крок 3</div>
+      <h3>Очікуйте підтвердження</h3>
+      <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ЕКРАН 3 — платний -->
+<div class="screen" id="screen-paid">
+  <a class="back-link" onclick="goBackFromPaid()">← назад</a>
+
+  <div class="panel">
+
+    <div class="sub-step" id="paid-step1">
+      <div class="panel-lbl mono">Крок 1</div>
+      <h3>Обери спосіб оплати</h3>
+      <div class="btn-stack">
+        <button class="btn btn-mono" onclick="showUsdtFlow()">Оплатити в USDT</button>
+        <button class="btn btn-mono" onclick="showCardFlow()">Оплатити на карту</button>
+      </div>
+    </div>
+
+    <div id="usdt-flow" style="display:none">
+
+      <div class="sub-step">
+        <div class="panel-lbl mono">Крок 1</div>
+        <h3>Скопіюй адресу USDT (TRC20)</h3>
+        <div class="pay-box">
+          <div class="pay-box-hdr">
+            <div class="pay-lbl">USDT (TRC20)</div>
+            <button type="button" class="copy-btn" onclick="copyText(document.getElementById('usdt-addr-val'),'usdt-copy-note')">Копіювати</button>
+          </div>
+          <div class="pay-val" id="usdt-addr-val" onclick="copyText(this,'usdt-copy-note')">TDQ9D4ZdeJvPDPm2qdTjNtcSHekq791mMc</div>
+        </div>
+        <div class="pay-note" id="usdt-copy-note">&nbsp;</div>
+      </div>
+
+      <div class="sub-step">
+        <div class="panel-lbl mono">Крок 2</div>
+        <h3>Надішли 25 USDT на цю адресу</h3>
+      </div>
+
+      <div class="sub-step" id="usdt-step3">
+        <div class="panel-lbl mono">Крок 3</div>
+        <h3>Встав хеш транзакції</h3>
+        <form id="usdt-form" onsubmit="return submitUsdtForm(event)">
+          <div class="f-row">
+            <input class="f-inp" id="usdt-tx" type="text" placeholder="Хеш транзакції (TXID)" maxlength="120" required autocomplete="off" oninput="validateUsdtForm()">
+          </div>
+          <button class="btn btn-mono" type="submit" id="usdt-submit-btn" disabled>Надіслати заявку</button>
+          <div class="err" id="usdt-err"></div>
+        </form>
+      </div>
+
+      <div class="sub-step" id="usdt-done" style="display:none">
+        <div class="panel-lbl mono">Крок 4</div>
+        <h3>Очікуйте підтвердження</h3>
+        <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
+      </div>
+
+    </div>
+
+    <div id="card-flow" style="display:none">
+
+      <div class="sub-step">
+        <div class="panel-lbl mono">Крок 1</div>
+        <h3>Скопіюй номер картки Monobank</h3>
+        <div class="pay-box">
+          <div class="pay-box-hdr">
+            <div class="pay-lbl">Monobank</div>
+            <button type="button" class="copy-btn" onclick="copyText(document.getElementById('card-num-val'),'card-copy-note')">Копіювати</button>
+          </div>
+          <div class="pay-val" id="card-num-val" onclick="copyText(this,'card-copy-note')">4441 1110 0507 4426</div>
+        </div>
+        <div class="pay-note" id="card-copy-note">&nbsp;</div>
+      </div>
+
+      <div class="sub-step">
+        <div class="panel-lbl mono">Крок 2</div>
+        <h3>Оплати 1128.75 грн</h3>
+      </div>
+
+      <div class="sub-step" id="card-step3">
+        <div class="panel-lbl mono">Крок 3</div>
+        <h3>Прикріпи скріншот оплати</h3>
+        <form id="card-form" onsubmit="return submitCardForm(event)">
+          <div class="f-row">
+            <label class="file-drop" id="card-shot-label" for="card-shot">Прикріпити скріншот оплати</label>
+            <input type="file" id="card-shot" accept="image/*" style="display:none" onchange="onFileSelected(this,'card-shot-label'); validateCardForm();">
+          </div>
+          <button class="btn btn-mono" type="submit" id="card-submit-btn" disabled>Надіслати заявку</button>
+          <div class="err" id="card-err"></div>
+        </form>
+      </div>
+
+      <div class="sub-step" id="card-done" style="display:none">
+        <div class="panel-lbl mono">Крок 4</div>
+        <h3>Очікуйте підтвердження</h3>
+        <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ЕКРАН 4 — доступ підтверджено (показується автоматично цьому пристрою) -->
+<div class="screen" id="screen-link">
+  <div class="panel">
+    <div class="sub-step">
+      <div class="panel-lbl mono">Доступ підтверджено</div>
+      <h3>Ось твоє посилання на канал</h3>
+      <a class="btn btn-mono" id="invite-link-btn" href="#" target="_blank" rel="noopener">Перейти в Telegram →</a>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+// TODO: підставити реальні дані Supabase-проєкту (окремого від Parashut), коли він буде готовий
+const SB_URL = 'https://lkdndggczlqpcylrudpa.supabase.co';
+const SB_KEY = 'sb_publishable_f_SmYZN-SCY5m1J0oYIg9Q_IOS6fE59';
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// УНІКАЛЬНИЙ ID ПРИСТРОЮ — щоб система впізнавала користувача при поверненні
+// і показувала саме його посилання, коли адмін підтвердить заявку.
+const DEVICE_ID_KEY = 'blue_device_id';
+function getDeviceId(){
+  let id = localStorage.getItem(DEVICE_ID_KEY);
+  if(!id){
+    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('dev-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+    localStorage.setItem(DEVICE_ID_KEY, id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+
+function copyText(el, noteId){
+  const text = el.textContent.replace(/\s/g,'');
+  navigator.clipboard.writeText(text).then(()=>{
+    const note = document.getElementById(noteId);
+    note.textContent = '✓ скопійовано';
+    setTimeout(()=>{ note.innerHTML = '&nbsp;'; }, 2000);
+  });
+}
+
+// UID у MEXC — лише цифри (типовий приклад: 51583341)
+function isValidMexcUid(uid){ return /^[0-9]{6,10}$/.test(uid); }
+
+function onFileSelected(input, labelId){
+  const label = document.getElementById(labelId);
+  if(input.files && input.files[0]){
+    label.textContent = '✓ ' + input.files[0].name;
+    label.classList.add('has-file');
+  } else {
+    label.textContent = 'Прикріпити скріншот оплати';
+    label.classList.remove('has-file');
+  }
+}
+
+// Завантаження скріншота оплати в Supabase Storage (бакет payment-screenshots)
+async function uploadPaymentScreenshot(file){
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_');
+  const path = DEVICE_ID + '-' + Date.now() + '-' + safeName;
+  const r = await fetch(SB_URL + '/storage/v1/object/payment-screenshots/' + encodeURIComponent(path), {
+    method: 'POST',
+    headers:{
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': file.type || 'application/octet-stream'
+    },
+    body: file
+  });
+  if(!r.ok){ const e = await r.text(); throw new Error(e); }
+  return SB_URL + '/storage/v1/object/public/payment-screenshots/' + encodeURIComponent(path);
+}
+
+function showUsdtFlow(){
+  document.getElementById('paid-step1').style.display = 'none';
+  document.getElementById('usdt-flow').style.display = 'block';
+  // скидаємо стан на випадок повторного відкриття цього способу оплати
+  document.getElementById('usdt-step3').style.display = 'block';
+  document.getElementById('usdt-done').style.display = 'none';
+  const tx = document.getElementById('usdt-tx');
+  tx.value = '';
+  document.getElementById('usdt-submit-btn').disabled = true;
+  document.getElementById('usdt-err').textContent = '';
+}
+
+function showCardFlow(){
+  document.getElementById('paid-step1').style.display = 'none';
+  document.getElementById('card-flow').style.display = 'block';
+  // скидаємо стан на випадок повторного відкриття цього способу оплати
+  document.getElementById('card-step3').style.display = 'block';
+  document.getElementById('card-done').style.display = 'none';
+  document.getElementById('card-shot').value = '';
+  onFileSelected(document.getElementById('card-shot'), 'card-shot-label');
+  document.getElementById('card-submit-btn').disabled = true;
+  document.getElementById('card-err').textContent = '';
+}
+
+function validateCardForm(){
+  const file = document.getElementById('card-shot').files[0];
+  document.getElementById('card-submit-btn').disabled = !file;
+}
+
+async function submitCardForm(e){
+  e.preventDefault();
+  const btn = document.getElementById('card-submit-btn');
+  const err = document.getElementById('card-err');
+  err.textContent = '';
+
+  const file = document.getElementById('card-shot').files[0];
+  if(!file){ err.textContent = 'Прикріпи скріншот оплати.'; return false; }
+
+  btn.disabled = true; btn.textContent = 'Надсилаю...';
+  try{
+    const screenshotUrl = await uploadPaymentScreenshot(file);
+    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+      name: null, telegram: null, mexc_uid: null, method: 'paid_card',
+      payment_screenshot_url: screenshotUrl,
+      status: 'pending', submitted_at: new Date().toISOString(),
+      device_id: DEVICE_ID
+    });
+    document.getElementById('card-step3').style.display = 'none';
+    document.getElementById('card-done').style.display = 'block';
+  }catch(ex){
+    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    btn.disabled = false; btn.textContent = 'Надіслати заявку';
+  }
+  return false;
+}
+
+// Контекстний "назад" на екрані платного доступу:
+// якщо відкритий конкретний спосіб оплати — повертає до вибору способу,
+// і лише звідти — до самого початку (вибір безкоштовний/платний).
+function goBackFromPaid(){
+  const usdtOpen = document.getElementById('usdt-flow').style.display !== 'none';
+  const cardOpen = document.getElementById('card-flow').style.display !== 'none';
+  if(usdtOpen){
+    document.getElementById('usdt-flow').style.display = 'none';
+    document.getElementById('paid-step1').style.display = 'block';
+  } else if(cardOpen){
+    document.getElementById('card-flow').style.display = 'none';
+    document.getElementById('paid-step1').style.display = 'block';
+  } else {
+    goTo('screen-choice');
+  }
+}
+
+function validateUsdtForm(){
+  const tx = document.getElementById('usdt-tx').value.trim();
+  document.getElementById('usdt-submit-btn').disabled = tx.length < 6;
+}
+
+async function submitUsdtForm(e){
+  e.preventDefault();
+  const btn = document.getElementById('usdt-submit-btn');
+  const err = document.getElementById('usdt-err');
+  err.textContent = '';
+
+  const tx = document.getElementById('usdt-tx').value.trim();
+  if(tx.length < 6){ err.textContent = 'Встав коректний хеш транзакції.'; return false; }
+
+  btn.disabled = true; btn.textContent = 'Надсилаю...';
+  try{
+    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+      name: null, telegram: null, mexc_uid: null, method: 'paid_usdt',
+      tx_hash: tx, status: 'pending', submitted_at: new Date().toISOString(),
+      device_id: DEVICE_ID
+    });
+    document.getElementById('usdt-step3').style.display = 'none';
+    document.getElementById('usdt-done').style.display = 'block';
+  }catch(ex){
+    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    btn.disabled = false; btn.textContent = 'Надіслати заявку';
+  }
+  return false;
+}
+
+function validateFreeForm(){
+  const tg = document.getElementById('free-tg').value.trim();
+  const uid = document.getElementById('free-uid').value.trim();
+  document.getElementById('free-submit-btn').disabled = !(tg.length>0 && isValidMexcUid(uid));
+}
+
+async function sbFetch(path, method='GET', body=null){
+  const r = await fetch(SB_URL+path, {
+    method,
+    headers:{
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer '+SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  if(!r.ok){ const e = await r.text(); throw new Error(e); }
+  const txt = await r.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function submitFreeForm(e){
+  e.preventDefault();
+  const btn = document.getElementById('free-submit-btn');
+  const err = document.getElementById('free-err');
+  err.textContent = '';
+
+  const tg = document.getElementById('free-tg').value.trim().replace(/^@/,'');
+  const uid = document.getElementById('free-uid').value.trim();
+
+  if(!isValidMexcUid(uid)){
+    err.textContent = 'UID має бути стандартним для MEXC — лише цифри.';
+    return false;
+  }
+
+  btn.disabled = true; btn.textContent = 'Надсилаю...';
+  try{
+    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+      name: null, telegram: tg, mexc_uid: uid, method: 'referral',
+      status: 'pending', submitted_at: new Date().toISOString(),
+      device_id: DEVICE_ID
+    });
+    document.getElementById('free-step2').style.display = 'none';
+    document.getElementById('free-step3').style.display = 'block';
+  }catch(ex){
+    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    btn.disabled = false; btn.textContent = 'Надіслати заявку';
+  }
+  return false;
+}
+
+
+// При завантаженні — перевіряємо, чи вже є заявка з цього пристрою,
+// і показуємо саме її статус (а не заново форму реєстрації).
+async function boot(){
+  try{
+    const rows = await sbFetch('/rest/v1/blue_registrations?device_id=eq.'+encodeURIComponent(DEVICE_ID)+'&select=*&order=submitted_at.desc&limit=1');
+    if(!rows || !rows.length) return;
+    const rec = rows[0];
+
+    if(rec.status === 'confirmed' && rec.invite_link){
+      document.getElementById('invite-link-btn').href = rec.invite_link;
+      goTo('screen-link');
+      return;
+    }
+
+    if(rec.status === 'pending'){
+      if(rec.method === 'referral'){
+        document.getElementById('free-step2').style.display = 'none';
+        document.getElementById('free-step3').style.display = 'block';
+        goTo('screen-free');
+      } else if(rec.method === 'paid_usdt'){
+        document.getElementById('paid-step1').style.display = 'none';
+        document.getElementById('usdt-flow').style.display = 'block';
+        document.getElementById('usdt-step3').style.display = 'none';
+        document.getElementById('usdt-done').style.display = 'block';
+        goTo('screen-paid');
+      } else if(rec.method === 'paid_card'){
+        document.getElementById('paid-step1').style.display = 'none';
+        document.getElementById('card-flow').style.display = 'block';
+        document.getElementById('card-step3').style.display = 'none';
+        document.getElementById('card-done').style.display = 'block';
+        goTo('screen-paid');
+      }
+    }
+  }catch(e){
+    // Supabase ще не підключено — лишаємось на звичайному стартовому екрані
+  }
+}
+boot();
+</script>
+</body>
+</html>
