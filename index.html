@@ -113,6 +113,8 @@ body{
 }
 .file-drop:hover{border-color:#555;color:#bbb;}
 .file-drop.has-file{border-style:solid;border-color:var(--blue);color:#fff;}
+.reject-lbl{color:var(--err) !important;}
+.reason-box{background:#141414;border:1px solid #262626;border-radius:6px;padding:14px;margin:14px 0;font-size:13px;color:#ddd;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -272,6 +274,18 @@ body{
   </div>
 </div>
 
+<!-- ЕКРАН 5 — заявку відхилено (показується автоматично цьому пристрою) -->
+<div class="screen" id="screen-rejected">
+  <div class="panel">
+    <div class="sub-step">
+      <div class="panel-lbl mono reject-lbl">Заявку відхилено</div>
+      <h3>На жаль, доступ не підтверджено</h3>
+      <div class="reason-box" id="rejected-reason-box"></div>
+      <button class="btn btn-mono" onclick="restartApplication()">Подати заявку повторно</button>
+    </div>
+  </div>
+</div>
+
 </div>
 <script>
 // TODO: підставити реальні дані Supabase-проєкту (окремого від Parashut), коли він буде готовий
@@ -281,6 +295,22 @@ const SB_KEY = 'sb_publishable_f_SmYZN-SCY5m1J0oYIg9Q_IOS6fE59';
 function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+}
+
+// Скидає всі кроки форм до початкового стану — потрібно, коли користувач
+// подає заявку повторно після відхилення (без перезавантаження сторінки).
+function restartApplication(){
+  document.getElementById('free-step2').style.display = 'block';
+  document.getElementById('free-step3').style.display = 'none';
+  document.getElementById('free-tg').value = '';
+  document.getElementById('free-uid').value = '';
+  document.getElementById('free-submit-btn').disabled = true;
+
+  document.getElementById('paid-step1').style.display = 'block';
+  document.getElementById('usdt-flow').style.display = 'none';
+  document.getElementById('card-flow').style.display = 'none';
+
+  goTo('screen-choice');
 }
 
 // УНІКАЛЬНИЙ ID ПРИСТРОЮ — щоб система впізнавала користувача при поверненні
@@ -500,9 +530,15 @@ async function boot(){
     if(!rows || !rows.length) return;
     const rec = rows[0];
 
-    if(rec.status === 'confirmed' && rec.invite_link){
+    if(rec.status === 'approved' && rec.invite_link){
       document.getElementById('invite-link-btn').href = rec.invite_link;
       goTo('screen-link');
+      return;
+    }
+
+    if(rec.status === 'rejected'){
+      document.getElementById('rejected-reason-box').textContent = rec.rejection_reason || 'Причину не вказано.';
+      goTo('screen-rejected');
       return;
     }
 
