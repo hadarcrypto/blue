@@ -239,8 +239,11 @@ body{
 
       <div class="sub-step" id="usdt-step3">
         <div class="panel-lbl mono">Крок 3</div>
-        <h3>Встав хеш транзакції</h3>
+        <h3>Вкажи Telegram і встав хеш транзакції</h3>
         <form id="usdt-form" onsubmit="return submitUsdtForm(event)">
+          <div class="f-row">
+            <input class="f-inp" id="usdt-tg" type="text" placeholder="Telegram, напр. @username" maxlength="40" required autocomplete="off" oninput="validateUsdtForm(); saveUiState();">
+          </div>
           <div class="f-row">
             <input class="f-inp" id="usdt-tx" type="text" placeholder="Хеш транзакції (TXID)" maxlength="120" required autocomplete="off" oninput="validateUsdtForm(); saveUiState();">
           </div>
@@ -281,8 +284,11 @@ body{
 
       <div class="sub-step" id="card-step3">
         <div class="panel-lbl mono">Крок 3</div>
-        <h3>Прикріпи скріншот оплати</h3>
+        <h3>Вкажи Telegram і прикріпи скріншот оплати</h3>
         <form id="card-form" onsubmit="return submitCardForm(event)">
+          <div class="f-row">
+            <input class="f-inp" id="card-tg" type="text" placeholder="Telegram, напр. @username" maxlength="40" required autocomplete="off" oninput="validateCardForm(); saveUiState();">
+          </div>
           <div class="f-row">
             <label class="file-drop" id="card-shot-label" for="card-shot">Прикріпити скріншот оплати</label>
             <input type="file" id="card-shot" accept="image/*" style="display:none" onchange="onFileSelected(this,'card-shot-label'); validateCardForm();">
@@ -348,13 +354,17 @@ function saveUiState(){
   const tgEl = document.getElementById('free-tg');
   const uidEl = document.getElementById('free-uid');
   const txEl = document.getElementById('usdt-tx');
+  const usdtTgEl = document.getElementById('usdt-tg');
+  const cardTgEl = document.getElementById('card-tg');
   const state = {
     screen: active ? active.id : 'screen-choice',
     paidOpen: document.getElementById('usdt-flow').style.display !== 'none' ? 'usdt'
              : (document.getElementById('card-flow').style.display !== 'none' ? 'card' : null),
     tg: tgEl ? tgEl.value : '',
     uid: uidEl ? uidEl.value : '',
-    usdtTx: txEl ? txEl.value : ''
+    usdtTx: txEl ? txEl.value : '',
+    usdtTg: usdtTgEl ? usdtTgEl.value : '',
+    cardTg: cardTgEl ? cardTgEl.value : ''
   };
   try{ localStorage.setItem(UI_STATE_KEY, JSON.stringify(state)); }catch(e){}
 }
@@ -368,8 +378,11 @@ function restoreUiState(){
     if(state.tg) document.getElementById('free-tg').value = state.tg;
     if(state.uid) document.getElementById('free-uid').value = state.uid;
     if(state.usdtTx) document.getElementById('usdt-tx').value = state.usdtTx;
+    if(state.usdtTg) document.getElementById('usdt-tg').value = state.usdtTg;
+    if(state.cardTg) document.getElementById('card-tg').value = state.cardTg;
     validateFreeForm();
     validateUsdtForm();
+    validateCardForm();
 
     if(state.screen === 'screen-paid' && state.paidOpen === 'usdt'){
       document.getElementById('paid-step1').style.display = 'none';
@@ -420,6 +433,13 @@ function restartApplication(){
   document.getElementById('paid-step1').style.display = 'block';
   document.getElementById('usdt-flow').style.display = 'none';
   document.getElementById('card-flow').style.display = 'none';
+  document.getElementById('usdt-tg').value = '';
+  document.getElementById('usdt-tx').value = '';
+  document.getElementById('usdt-submit-btn').disabled = true;
+  document.getElementById('card-tg').value = '';
+  document.getElementById('card-shot').value = '';
+  onFileSelected(document.getElementById('card-shot'), 'card-shot-label');
+  document.getElementById('card-submit-btn').disabled = true;
 
   goTo('screen-choice');
 
@@ -495,6 +515,7 @@ function showUsdtFlow(){
   document.getElementById('usdt-done').style.display = 'none';
   const tx = document.getElementById('usdt-tx');
   tx.value = '';
+  document.getElementById('usdt-tg').value = '';
   document.getElementById('usdt-submit-btn').disabled = true;
   document.getElementById('usdt-err').textContent = '';
   saveUiState();
@@ -507,6 +528,7 @@ function showCardFlow(){
   document.getElementById('card-step3').style.display = 'block';
   document.getElementById('card-done').style.display = 'none';
   document.getElementById('card-shot').value = '';
+  document.getElementById('card-tg').value = '';
   onFileSelected(document.getElementById('card-shot'), 'card-shot-label');
   document.getElementById('card-submit-btn').disabled = true;
   document.getElementById('card-err').textContent = '';
@@ -514,8 +536,9 @@ function showCardFlow(){
 }
 
 function validateCardForm(){
+  const tg = document.getElementById('card-tg').value.trim();
   const file = document.getElementById('card-shot').files[0];
-  document.getElementById('card-submit-btn').disabled = !file;
+  document.getElementById('card-submit-btn').disabled = !(tg.length>0 && file);
 }
 
 async function submitCardForm(e){
@@ -524,14 +547,16 @@ async function submitCardForm(e){
   const err = document.getElementById('card-err');
   err.textContent = '';
 
+  const tg = document.getElementById('card-tg').value.trim().replace(/^@/,'');
   const file = document.getElementById('card-shot').files[0];
+  if(!tg){ err.textContent = 'Вкажи свій Telegram.'; return false; }
   if(!file){ err.textContent = 'Прикріпи скріншот оплати.'; return false; }
 
   btn.disabled = true; btn.textContent = 'Надсилаю...';
   try{
     const screenshotUrl = await uploadPaymentScreenshot(file);
     await sbFetch('/rest/v1/blue_registrations', 'POST', {
-      name: null, telegram: null, mexc_uid: null, method: 'paid_card',
+      name: null, telegram: tg, mexc_uid: null, method: 'paid_card',
       payment_screenshot_url: screenshotUrl,
       status: 'pending', submitted_at: new Date().toISOString(),
       device_id: DEVICE_ID
@@ -565,8 +590,9 @@ function goBackFromPaid(){
 }
 
 function validateUsdtForm(){
+  const tg = document.getElementById('usdt-tg').value.trim();
   const tx = document.getElementById('usdt-tx').value.trim();
-  document.getElementById('usdt-submit-btn').disabled = tx.length < 6;
+  document.getElementById('usdt-submit-btn').disabled = !(tg.length>0 && tx.length>=6);
 }
 
 async function submitUsdtForm(e){
@@ -575,13 +601,15 @@ async function submitUsdtForm(e){
   const err = document.getElementById('usdt-err');
   err.textContent = '';
 
+  const tg = document.getElementById('usdt-tg').value.trim().replace(/^@/,'');
   const tx = document.getElementById('usdt-tx').value.trim();
+  if(!tg){ err.textContent = 'Вкажи свій Telegram.'; return false; }
   if(tx.length < 6){ err.textContent = 'Встав коректний хеш транзакції.'; return false; }
 
   btn.disabled = true; btn.textContent = 'Надсилаю...';
   try{
     await sbFetch('/rest/v1/blue_registrations', 'POST', {
-      name: null, telegram: null, mexc_uid: null, method: 'paid_usdt',
+      name: null, telegram: tg, mexc_uid: null, method: 'paid_usdt',
       tx_hash: tx, status: 'pending', submitted_at: new Date().toISOString(),
       device_id: DEVICE_ID
     });
