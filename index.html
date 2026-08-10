@@ -43,7 +43,17 @@ body{
   .phone{ padding:18px 14px 32px; }
 }
 .screen{display:none;width:100%;}
-.screen.active{display:block;}
+.screen.active{display:block;animation:fadeSlideIn .35s cubic-bezier(.22,.61,.36,1);}
+@keyframes fadeSlideIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.fade-in{animation:fadeSlideIn .3s cubic-bezier(.22,.61,.36,1);}
+@keyframes popIn{
+  0%{transform:scale(.5);opacity:0;}
+  70%{transform:scale(1.08);opacity:1;}
+  100%{transform:scale(1);opacity:1;}
+}
 
 /* КАРТКА ВИБОРУ */
 .card{
@@ -60,6 +70,7 @@ body{
 }
 .card-btn:last-child{margin-bottom:0;}
 .card-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.card-btn:active{transform:scale(.97);}
 
 /* КРОКИ ПІСЛЯ ВИБОРУ */
 .back-link{
@@ -82,6 +93,7 @@ body{
   font-family:'DM Sans',sans-serif;transition:all .15s;
 }
 .close-x:hover{border-color:var(--blue);color:var(--blue);}
+.close-x:active{transform:scale(.9);}
 .panel-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
 .panel h3{font-size:16px;margin-bottom:6px;}
 .panel p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
@@ -97,6 +109,7 @@ body{
   text-decoration:none;transition:all .15s;width:100%;
 }
 .btn:hover{opacity:.9;}
+.btn:active:not(:disabled){transform:scale(.97);}
 .btn-blue{background:var(--blue);color:#fff;box-shadow:0 10px 24px -10px rgba(28,159,224,.7);}
 .btn-blue:hover{background:var(--blue-dim);opacity:1;}
 .btn-blue:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none;}
@@ -126,11 +139,13 @@ body{
 }
 .copy-btn svg{width:16px;height:16px;}
 .copy-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(28,159,224,.14);}
+.copy-btn:active{transform:scale(.92);}
 .copy-btn.copied{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.1);}
 .f-row{margin-bottom:14px;}
 .f-inp{
   width:100%;padding:12px;border:1px solid var(--border);background:var(--panel2);
   font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;border-radius:6px;
+  transition:border-color .15s ease;
 }
 .f-inp::placeholder{color:#4f6577;}
 .f-inp:focus{outline:none;border-color:var(--blue);}
@@ -141,6 +156,7 @@ body{
   border-radius:6px;cursor:pointer;transition:all .15s;
 }
 .file-drop:hover{border-color:var(--blue);color:var(--blue);}
+.file-drop:active{transform:scale(.99);}
 .file-drop.has-file{border-style:solid;border-color:var(--blue);color:#fff;}
 .reject-lbl{color:var(--err) !important;}
 .reason-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px;margin:14px 0;font-size:13px;color:#ddd;line-height:1.6;}
@@ -148,6 +164,7 @@ body{
 .check-circle{
   width:56px;height:56px;border-radius:50%;background:#2ecc71;
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  animation:popIn .45s cubic-bezier(.34,1.56,.64,1);
 }
 .confirm-center h3{text-align:center;}
 .confirm-lbl{color:#2ecc71 !important;text-align:center;}
@@ -191,7 +208,7 @@ body{
       </form>
     </div>
 
-    <div class="sub-step" id="free-step3" style="display:none">
+    <div class="sub-step fade-in" id="free-step3" style="display:none">
       <div class="panel-lbl mono">Крок 3</div>
       <h3>Очікуйте підтвердження</h3>
       <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
@@ -206,7 +223,7 @@ body{
 
   <div class="panel">
 
-    <div class="sub-step" id="paid-step1">
+    <div class="sub-step fade-in" id="paid-step1">
       <div class="panel-lbl mono">Крок 1</div>
       <h3>Обери спосіб оплати</h3>
       <div class="btn-stack">
@@ -215,7 +232,7 @@ body{
       </div>
     </div>
 
-    <div id="usdt-flow" style="display:none">
+    <div id="usdt-flow" class="fade-in" style="display:none">
 
       <div class="sub-step">
         <div class="panel-lbl mono">Крок 1</div>
@@ -252,7 +269,7 @@ body{
         </form>
       </div>
 
-      <div class="sub-step" id="usdt-done" style="display:none">
+      <div class="sub-step fade-in" id="usdt-done" style="display:none">
         <div class="panel-lbl mono">Крок 4</div>
         <h3>Очікуйте підтвердження</h3>
         <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
@@ -260,7 +277,7 @@ body{
 
     </div>
 
-    <div id="card-flow" style="display:none">
+    <div id="card-flow" class="fade-in" style="display:none">
 
       <div class="sub-step">
         <div class="panel-lbl mono">Крок 1</div>
@@ -298,7 +315,7 @@ body{
         </form>
       </div>
 
-      <div class="sub-step" id="card-done" style="display:none">
+      <div class="sub-step fade-in" id="card-done" style="display:none">
         <div class="panel-lbl mono">Крок 4</div>
         <h3>Очікуйте підтвердження</h3>
         <p>Посилання на доступ з'явиться тут, на цій сторінці, одразу після підтвердження.</p>
@@ -555,16 +572,21 @@ async function submitCardForm(e){
   btn.disabled = true; btn.textContent = 'Надсилаю...';
   try{
     const screenshotUrl = await uploadPaymentScreenshot(file);
-    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+    const inserted = await sbFetch('/rest/v1/blue_registrations', 'POST', {
       name: null, telegram: tg, mexc_uid: null, method: 'paid_card',
       payment_screenshot_url: screenshotUrl,
       status: 'pending', submitted_at: new Date().toISOString(),
       device_id: DEVICE_ID
     });
-    document.getElementById('card-step3').style.display = 'none';
-    document.getElementById('card-done').style.display = 'block';
+    const rec = inserted && inserted[0];
+    if(rec){ saveRegCache(rec); applyRegState(rec); }
+    else{
+      document.getElementById('card-step3').style.display = 'none';
+      document.getElementById('card-done').style.display = 'block';
+    }
   }catch(ex){
-    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    console.error('submitCardForm error:', ex);
+    err.textContent = 'Помилка відправки: ' + (ex && ex.message ? String(ex.message).slice(0,180) : 'невідома помилка');
     btn.disabled = false; btn.textContent = 'Надіслати заявку';
   }
   return false;
@@ -608,15 +630,20 @@ async function submitUsdtForm(e){
 
   btn.disabled = true; btn.textContent = 'Надсилаю...';
   try{
-    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+    const inserted = await sbFetch('/rest/v1/blue_registrations', 'POST', {
       name: null, telegram: tg, mexc_uid: null, method: 'paid_usdt',
       tx_hash: tx, status: 'pending', submitted_at: new Date().toISOString(),
       device_id: DEVICE_ID
     });
-    document.getElementById('usdt-step3').style.display = 'none';
-    document.getElementById('usdt-done').style.display = 'block';
+    const rec = inserted && inserted[0];
+    if(rec){ saveRegCache(rec); applyRegState(rec); }
+    else{
+      document.getElementById('usdt-step3').style.display = 'none';
+      document.getElementById('usdt-done').style.display = 'block';
+    }
   }catch(ex){
-    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    console.error('submitUsdtForm error:', ex);
+    err.textContent = 'Помилка відправки: ' + (ex && ex.message ? String(ex.message).slice(0,180) : 'невідома помилка');
     btn.disabled = false; btn.textContent = 'Надіслати заявку';
   }
   return false;
@@ -660,15 +687,20 @@ async function submitFreeForm(e){
 
   btn.disabled = true; btn.textContent = 'Надсилаю...';
   try{
-    await sbFetch('/rest/v1/blue_registrations', 'POST', {
+    const inserted = await sbFetch('/rest/v1/blue_registrations', 'POST', {
       name: null, telegram: tg, mexc_uid: uid, method: 'referral',
       status: 'pending', submitted_at: new Date().toISOString(),
       device_id: DEVICE_ID
     });
-    document.getElementById('free-step2').style.display = 'none';
-    document.getElementById('free-step3').style.display = 'block';
+    const rec = inserted && inserted[0];
+    if(rec){ saveRegCache(rec); applyRegState(rec); }
+    else{
+      document.getElementById('free-step2').style.display = 'none';
+      document.getElementById('free-step3').style.display = 'block';
+    }
   }catch(ex){
-    err.textContent = 'Помилка відправки. Спробуй ще раз.';
+    console.error('submitFreeForm error:', ex);
+    err.textContent = 'Помилка відправки: ' + (ex && ex.message ? String(ex.message).slice(0,180) : 'невідома помилка');
     btn.disabled = false; btn.textContent = 'Надіслати заявку';
   }
   return false;
